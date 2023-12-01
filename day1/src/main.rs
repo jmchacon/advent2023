@@ -1,15 +1,10 @@
 //! day1 advent 20XX
 use clap::Parser;
 use color_eyre::eyre::Result;
-use grid::{Grid, Location};
-use itertools::Itertools;
-use slab_tree::tree::TreeBuilder;
-use std::collections::HashMap;
 use std::fs::File;
 use std::io;
 use std::io::BufRead;
 use std::path::Path;
-use strum_macros::Display;
 
 #[derive(Parser)]
 #[command(author, version, about)]
@@ -30,8 +25,13 @@ fn main() -> Result<()> {
     let lines: Vec<String> = io::BufReader::new(file).lines().flatten().collect();
 
     let mut sum = 0;
-    for (line_num, line) in lines.iter().enumerate() {
+    let mut sum2 = 0;
+    let matches = [
+        "one", "two", "three", "four", "five", "six", "seven", "eight", "nine",
+    ];
+    for line in &lines {
         let mut val = 0;
+        let mut val2 = 0;
         for b in line.as_bytes() {
             match b {
                 b'0' | b'1' | b'2' | b'3' | b'4' | b'5' | b'6' | b'7' | b'8' | b'9' => {
@@ -45,22 +45,77 @@ fn main() -> Result<()> {
                 _ => {}
             }
         }
-
-        for b in line.as_bytes().iter().rev() {
+        let mut loc = 0;
+        for (l, b) in line.as_bytes().iter().enumerate() {
             match b {
-                b'0' | b'1' | b'2' | b'3' | b'4' | b'5' | b'6' | b'7' | b'8' | b'9' => {
+                b'1' | b'2' | b'3' | b'4' | b'5' | b'6' | b'7' | b'8' | b'9' => {
                     let t = std::str::from_utf8(&[*b])
                         .unwrap()
                         .parse::<usize>()
                         .unwrap();
-                    val += t;
+                    val = 10 * t;
+                    loc = l;
                     break;
                 }
                 _ => {}
             }
         }
+        // We know the index for the first digit. Now run through matches and
+        // find the first index for any of those.
+        let mut mm = matches
+            .iter()
+            .map(|f| line.match_indices(f).collect::<Vec<_>>())
+            .collect::<Vec<_>>();
+        if val != 0 {
+            mm[(val / 10) - 1].push((loc, ""));
+        }
+
+        let mut min = usize::MAX;
+        for (num, vals) in mm.iter().enumerate() {
+            for v in vals {
+                if v.0 < min {
+                    min = v.0;
+                    val2 = 10 * (num + 1);
+                }
+            }
+        }
+        let mut sec = 0;
+        let mut found = false;
+        for (l, b) in line.as_bytes().iter().rev().enumerate() {
+            match b {
+                b'1' | b'2' | b'3' | b'4' | b'5' | b'6' | b'7' | b'8' | b'9' => {
+                    let t = std::str::from_utf8(&[*b])
+                        .unwrap()
+                        .parse::<usize>()
+                        .unwrap();
+                    sec = t;
+                    loc = line.as_bytes().len() - l - 1;
+                    found = true;
+                    break;
+                }
+                _ => {}
+            }
+        }
+        val += sec;
+        if found {
+            mm[sec - 1].push((loc, ""));
+        }
+        min = 0;
+        let mut t = 0;
+        for (num, vals) in mm.iter().enumerate() {
+            for v in vals {
+                if v.0 >= min {
+                    min = v.0;
+                    t = num + 1;
+                }
+            }
+        }
+        val2 += t;
+
         sum += val;
+        sum2 += val2;
     }
     println!("part1 - {sum}");
+    println!("part2 - {sum2}");
     Ok(())
 }
