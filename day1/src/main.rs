@@ -29,6 +29,38 @@ fn main() -> Result<()> {
     let file = File::open(filename)?;
     let lines: Vec<String> = io::BufReader::new(file).lines().flatten().collect();
 
-    for (line_num, line) in lines.iter().enumerate() {}
+    let mut sum = 0;
+    for (line_num, line) in lines.iter().enumerate() {
+        let mut val = 0;
+        for b in line.as_bytes() {
+            match b {
+                b'0' | b'1' | b'2' | b'3' | b'4' | b'5' | b'6' | b'7' | b'8' | b'9' => {
+                    let t = std::str::from_utf8(&[*b])
+                        .unwrap()
+                        .parse::<usize>()
+                        .unwrap();
+                    val = 10 * t;
+                    break;
+                }
+                _ => {}
+            }
+        }
+
+        for b in line.as_bytes().iter().rev() {
+            match b {
+                b'0' | b'1' | b'2' | b'3' | b'4' | b'5' | b'6' | b'7' | b'8' | b'9' => {
+                    let t = std::str::from_utf8(&[*b])
+                        .unwrap()
+                        .parse::<usize>()
+                        .unwrap();
+                    val += t;
+                    break;
+                }
+                _ => {}
+            }
+        }
+        sum += val;
+    }
+    println!("part1 - {sum}");
     Ok(())
 }
