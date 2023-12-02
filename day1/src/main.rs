@@ -1,11 +1,11 @@
 //! day1 advent 20XX
 use clap::Parser;
 use color_eyre::eyre::Result;
+use itertools::merge;
 use std::collections::HashMap;
 use std::fs::File;
 use std::io;
 use std::io::BufRead;
-use std::iter::zip;
 use std::path::Path;
 
 #[derive(Parser)]
@@ -80,52 +80,30 @@ fn main() -> Result<()> {
         }
 
         // Run over the digits and map to all the places each one matches in the string.
+        // Flatten it all down as the digit matches comes back in the 2nd piece
+        // of the match_indices tuple and the first piece of the tuple is the index
+        // which we can use to min/max once flattened.
         let digits_m = digits
             .iter()
-            .map(|f| line.match_indices(f).collect::<Vec<_>>())
+            .flat_map(|f| line.match_indices(f).collect::<Vec<_>>())
             .collect::<Vec<_>>();
-        // Do the same with the alpha matches.
-        let full_m = matches
+        // Do the same with the alpha matches. Could inline below but pulled into
+        // it's own var for readability.
+        let alpha_m = matches
             .iter()
-            .map(|f| line.match_indices(f).collect::<Vec<_>>())
+            .flat_map(|f| line.match_indices(f).collect::<Vec<_>>())
             .collect::<Vec<_>>();
 
-        // Compute the alpha min by zipping together the digits matches and the alpha matches.
-        // Then as we will get each sub vector as pairs merge those together and take the min
-        // of that but use filter_map to eliminate all the None's and unwrap implicitly. At this
-        // point index doesn't matter since the match_indicies filled in the string value so we
-        // can use the map to look that up later.
-        // After we have the reduced set take another min() on that to get the final value and then
-        // unwrap it. This can't be None if the string is proper (has at least 1 number or 1 alpha case).
-        // If not unwrap panic is fine here.
-        let full_min = zip(digits_m.clone(), full_m.clone())
-            .filter_map(|f| itertools::merge(f.0, f.1).min())
-            .min()
-            .unwrap();
-        // Do the same as above but get the max. Due to the way min/max work can't avoid 2 iterations like this.
-        let full_max = zip(digits_m.clone(), full_m.clone())
-            .filter_map(|f| itertools::merge(f.0, f.1).max())
-            .max()
-            .unwrap();
+        // Create a combined vec of the digits/alpha where they are paired up correctly.
+        // Flatten it back again so we can min/max on it easily.
+        let combined = merge(digits_m.clone(), alpha_m).collect::<Vec<_>>();
 
-        // Digits are generally the same except we need unwrap_or() instead since we may have a string
-        // of only alpha. In that case a sentinel just means the part1 case below gets skipped.
-        let digits_min = digits_m
-            .iter()
-            .filter_map(|f| f.iter().min())
-            .min()
-            .unwrap_or(&(usize::MAX, ""));
-        let digits_max = digits_m
-            .iter()
-            .filter_map(|f| f.iter().max())
-            .max()
-            .unwrap_or(&(usize::MIN, ""));
-
-        // If we didn't find any digits just skip sum since it only involved them.
-        if digits_min.0 != usize::MAX {
-            sum += to_digits[digits_min.1] * 10 + to_digits[digits_max.1];
+        if digits_m.iter().min().is_some() {
+            sum += to_digits[digits_m.iter().min().unwrap().1] * 10
+                + to_digits[digits_m.iter().max().unwrap().1];
         }
-        sum2 += to_digits[full_min.1] * 10 + to_digits[full_max.1];
+        sum2 += to_digits[combined.iter().min().unwrap().1] * 10
+            + to_digits[combined.iter().max().unwrap().1];
     }
     println!("part1 - {sum}");
     println!("part2 - {sum2}");
