@@ -34,6 +34,7 @@ fn main() -> Result<()> {
     let lines: Vec<String> = io::BufReader::new(file).lines().flatten().collect();
 
     let mut total = 0;
+    let mut total2 = 0;
     for (line_num, line) in lines.iter().enumerate() {
         let parts = line.split_whitespace().collect::<Vec<_>>();
         assert!(parts[0] == "Game", "Invalid line {}: {line}", line_num + 1);
@@ -43,40 +44,48 @@ fn main() -> Result<()> {
         let balls = rem.split(';').collect::<Vec<_>>();
 
         let mut good = true;
+        let mut max_red = 0;
+        let mut max_green = 0;
+        let mut max_blue = 0;
         for b in &balls {
-            let parts = b.split_whitespace().collect::<Vec<_>>();
-            for i in (0..parts.len()).step_by(2) {
-                let num = parts[i].parse::<usize>().unwrap();
-                match parts[i + 1].trim_end_matches(',') {
+            let ball_parts = b.split_whitespace().collect::<Vec<_>>();
+            for i in (0..ball_parts.len()).step_by(2) {
+                let num = ball_parts[i].parse::<usize>().unwrap();
+                match ball_parts[i + 1].trim_end_matches(',') {
                     "red" => {
                         if num > args.red {
                             good = false;
+                        }
+                        if num > max_red {
+                            max_red = num;
                         }
                     }
                     "blue" => {
                         if num > args.blue {
                             good = false;
                         }
+                        if num > max_blue {
+                            max_blue = num;
+                        }
                     }
                     "green" => {
                         if num > args.green {
                             good = false;
                         }
+                        if num > max_green {
+                            max_green = num;
+                        }
                     }
                     _ => panic!(),
                 }
-                if !good {
-                    break;
-                }
-            }
-            if !good {
-                break;
             }
         }
         if good {
             total += game;
         }
+        total2 += max_red * max_blue * max_green;
     }
     println!("part1 - {total}");
+    println!("part2 - {total2}");
     Ok(())
 }
