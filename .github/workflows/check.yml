@@ -48,7 +48,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           # For AoC the stub code has these so ignore them by default till
           # we're done when this gets removed.
-          args:  -A unused_imports -A unused_variables
+          args: -- -A unused_imports -A unused_variables
   doc:
     runs-on: ubuntu-latest
     name: nightly / doc
