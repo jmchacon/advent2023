@@ -79,11 +79,12 @@ fn main() -> Result<()> {
             min = new_min;
         }
     }
+    println!("part1 - {min}");
+
     let mut part2_min = usize::MAX;
     for i in (0..seeds.len()).step_by(2) {
         let seed_start = seeds[i];
         let seed_rng = seeds[i + 1];
-        println!("{seed_start}..{} - {seed_rng}", seed_start + seed_rng);
         for s in seed_start..seed_start + seed_rng {
             let new_min = find_min(s, &maps);
             if new_min < part2_min {
@@ -91,7 +92,6 @@ fn main() -> Result<()> {
             }
         }
     }
-    println!("part1 - {min}");
     println!("part2 - {part2_min}");
     Ok(())
 }

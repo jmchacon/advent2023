@@ -37,8 +37,6 @@ fn main() -> Result<()> {
         .skip(1)
         .map(|f| f.parse::<usize>().unwrap())
         .collect::<Vec<_>>();
-    println!("{times:?}");
-    println!("{distances:?}");
 
     let mut ways = vec![];
     for (pos, t) in times.iter().enumerate() {
@@ -61,8 +59,7 @@ fn main() -> Result<()> {
         .join("")
         .parse::<usize>()
         .unwrap();
-    println!("{time}");
-    println!("{distance}");
+
     let mut way = 0;
     // Skip first and last as their distance is always 0
     for i in 1..time {
