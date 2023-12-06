@@ -73,32 +73,48 @@ fn main() -> Result<()> {
     }
 
     let mut min = usize::MAX;
-    let mut cur = "seed";
-    let mut id;
     for s in &seeds {
-        id = *s;
-        loop {
-            let m = &maps[cur];
-
-            for r in &m.1 {
-                let dest = r[0];
-                let src = r[1];
-                let rng = r[2];
-                if id >= src && id < src + rng {
-                    id = id - src + dest;
-                    break;
-                }
-            }
-            cur = m.0;
-            if !maps.contains_key(cur) {
-                if id < min {
-                    min = id;
-                }
-                cur = "seed";
-                break;
+        let new_min = find_min(*s, &maps);
+        if new_min < min {
+            min = new_min;
+        }
+    }
+    let mut part2_min = usize::MAX;
+    for i in (0..seeds.len()).step_by(2) {
+        let seed_start = seeds[i];
+        let seed_rng = seeds[i + 1];
+        println!("{seed_start}..{} - {seed_rng}", seed_start + seed_rng);
+        for s in seed_start..seed_start + seed_rng {
+            let new_min = find_min(s, &maps);
+            if new_min < part2_min {
+                part2_min = new_min;
             }
         }
     }
     println!("part1 - {min}");
+    println!("part2 - {part2_min}");
     Ok(())
+}
+
+fn find_min(seed: usize, maps: &HashMap<&str, (&str, Vec<Vec<usize>>)>) -> usize {
+    let mut cur = "seed";
+
+    let mut id = seed;
+    loop {
+        let m = &maps[cur];
+
+        for r in &m.1 {
+            let dest = r[0];
+            let src = r[1];
+            let rng = r[2];
+            if id >= src && id < src + rng {
+                id = id - src + dest;
+                break;
+            }
+        }
+        cur = m.0;
+        if !maps.contains_key(cur) {
+            return id;
+        }
+    }
 }
