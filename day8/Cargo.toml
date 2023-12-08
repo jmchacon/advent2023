@@ -13,3 +13,4 @@ strum = { workspace = true }
 strum_macros = { workspace = true }
 itertools = { workspace = true }
 grid = { workspace = true }
+num = "0.4.1"
