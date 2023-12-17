@@ -39,7 +39,6 @@ enum Hand {
     FiveOfAKind(Vec<Card>),
 }
 
-#[allow(clippy::too_many_lines)]
 fn main() -> Result<()> {
     color_eyre::install()?;
     let args: Args = Args::parse();
@@ -50,6 +49,23 @@ fn main() -> Result<()> {
 
     let mut hands = vec![];
     let mut hands_part2 = vec![];
+    // Input has the form:
+    //
+    // XXXXX nnn
+    //
+    // Where X are various combinations of cards forming 5 card poker hands
+    // of 5 of a kind, 4 of a kind, full hourse, 2 pair, pair and high card.
+    // i.e. no straights/flushes here.
+    //
+    // The cards don't change order so you have to find the best hand and then
+    // sort them by hand type. Then inside each hand they sort based on Card
+    // which is ordered.
+    //
+    // Once sorted make a sum of <pos> * nnn
+    //
+    // Part2 is the same except there can now be jokers (represented as J) which
+    // make hands as expected (wild card) but for sorting are the worst card.
+    // Compute the same sum once you get a proper sort.
     for (line_num, line) in lines.iter().enumerate() {
         let parts = line.split_whitespace().collect::<Vec<_>>();
         assert!(
@@ -95,184 +111,13 @@ fn main() -> Result<()> {
                 .or_insert(1);
             cards_part2.push(card);
         }
-        // We don't move cards around so use the counts to determine type of hand.
-        match counts.len() {
-            1 => hands.push((Hand::FiveOfAKind(cards), bid)),
-            2 => {
-                // Either AAAAx or AAAKK so if one count is 4 we know 4 of a kind.
-                if *counts.values().max().unwrap() == 4 {
-                    hands.push((Hand::FourOfAKind(cards), bid));
-                } else {
-                    hands.push((Hand::FullHouse(cards), bid));
-                }
-            }
-            3 => {
-                // Either AAAxy or AAKKy so if one count is 3 we know 3 of a kind.
-                if *counts.values().max().unwrap() == 3 {
-                    hands.push((Hand::ThreeOfAKind(cards), bid));
-                } else {
-                    hands.push((Hand::TwoPair(cards), bid));
-                }
-            }
-            4 => hands.push((Hand::OnePair(cards), bid)), // 4 distinct cards == 1 pair
-            5 => hands.push((Hand::HighCard(cards), bid)),
-            _ => panic!(),
-        };
 
-        // part2
-        // Check for jokers on each part first. Otherwise as above.
-        match counts_part2.len() {
-            1 => hands_part2.push((Hand::FiveOfAKind(cards_part2), bid)),
-            2 => {
-                if counts_part2.contains_key(&Card::Joker) {
-                    // Any jokers means 1 or 4 which means 5 of a kind.
-                    hands_part2.push((Hand::FiveOfAKind(cards_part2), bid));
-                } else {
-                    if *counts_part2.values().max().unwrap() == 4 {
-                        hands_part2.push((Hand::FourOfAKind(cards_part2), bid));
-                    } else {
-                        hands_part2.push((Hand::FullHouse(cards_part2), bid));
-                    }
-                }
-            }
-            3 => {
-                if counts_part2.contains_key(&Card::Joker) {
-                    match counts_part2[&Card::Joker] {
-                        2 | 3 => {
-                            // 3 jokers means 4 of a kind
-                            // 2 jokers means 4 of a kind also (JJxxy)
-                            // 1 joker means 4 of a kind also (Jxxxy)
-                            hands_part2.push((Hand::FourOfAKind(cards_part2), bid));
-                        }
-                        1 => {
-                            // 1 Joker means either xxxJy or xxJyy. The former is 4 of a kind
-                            // and the latter is a full house.
-                            if *counts_part2.values().max().unwrap() == 3 {
-                                hands_part2.push((Hand::FourOfAKind(cards_part2), bid));
-                            } else {
-                                hands_part2.push((Hand::FullHouse(cards_part2), bid));
-                            }
-                        }
-                        _ => panic!(),
-                    }
-                } else {
-                    // Either AAAxy or AAKKy so if one count is 3 we know 3 of a kind.
-                    if *counts_part2.values().max().unwrap() == 3 {
-                        hands_part2.push((Hand::ThreeOfAKind(cards_part2), bid));
-                    } else {
-                        hands_part2.push((Hand::TwoPair(cards_part2), bid));
-                    }
-                }
-            }
-            4 => {
-                if counts_part2.contains_key(&Card::Joker) {
-                    // any joker means xyzaa == 3 of a kind for a=J or x|y|z=J
-                    hands_part2.push((Hand::ThreeOfAKind(cards_part2), bid));
-                } else {
-                    hands_part2.push((Hand::OnePair(cards_part2), bid));
-                }
-            }
-            5 => {
-                if counts_part2.contains_key(&Card::Joker) {
-                    // any joker means xyzab == pair
-                    hands_part2.push((Hand::OnePair(cards_part2), bid));
-                } else {
-                    hands_part2.push((Hand::HighCard(cards_part2), bid));
-                }
-            }
-            _ => panic!(),
-        }
+        // We don't move cards around so use the counts to determine type of hand.
+        hands.push((make_hand(&counts, cards), bid));
+        hands_part2.push((make_hand(&counts_part2, cards_part2), bid));
     }
 
     hands.sort();
-
-    /*hands_part2 = hands_part2
-    .iter()
-    .map(|f| {
-        (
-            match &f.0 {
-                Hand::HighCard(v) => Hand::HighCard(
-                    v.iter()
-                        .map(|f| {
-                            if *f == Card::Joker {
-                                Card::Jack
-                            } else {
-                                f.clone()
-                            }
-                        })
-                        .collect::<Vec<_>>(),
-                ),
-                Hand::OnePair(v) => Hand::OnePair(
-                    v.iter()
-                        .map(|f| {
-                            if *f == Card::Joker {
-                                Card::Jack
-                            } else {
-                                f.clone()
-                            }
-                        })
-                        .collect::<Vec<_>>(),
-                ),
-                Hand::TwoPair(v) => Hand::TwoPair(
-                    v.iter()
-                        .map(|f| {
-                            if *f == Card::Joker {
-                                Card::Jack
-                            } else {
-                                f.clone()
-                            }
-                        })
-                        .collect::<Vec<_>>(),
-                ),
-                Hand::ThreeOfAKind(v) => Hand::ThreeOfAKind(
-                    v.iter()
-                        .map(|f| {
-                            if *f == Card::Joker {
-                                Card::Jack
-                            } else {
-                                f.clone()
-                            }
-                        })
-                        .collect::<Vec<_>>(),
-                ),
-                Hand::FullHouse(v) => Hand::FullHouse(
-                    v.iter()
-                        .map(|f| {
-                            if *f == Card::Joker {
-                                Card::Jack
-                            } else {
-                                f.clone()
-                            }
-                        })
-                        .collect::<Vec<_>>(),
-                ),
-                Hand::FourOfAKind(v) => Hand::FourOfAKind(
-                    v.iter()
-                        .map(|f| {
-                            if *f == Card::Joker {
-                                Card::Jack
-                            } else {
-                                f.clone()
-                            }
-                        })
-                        .collect::<Vec<_>>(),
-                ),
-                Hand::FiveOfAKind(v) => Hand::FiveOfAKind(
-                    v.iter()
-                        .map(|f| {
-                            if *f == Card::Joker {
-                                Card::Jack
-                            } else {
-                                f.clone()
-                            }
-                        })
-                        .collect::<Vec<_>>(),
-                ),
-            },
-            f.1,
-        )
-    })
-    .collect::<Vec<_>>();*/
     hands_part2.sort();
 
     if args.debug {
@@ -288,4 +133,70 @@ fn main() -> Result<()> {
         println!("part{part}: {score}");
     }
     Ok(())
+}
+
+fn make_hand(counts: &HashMap<Card, usize>, cards: Vec<Card>) -> Hand {
+    // part2
+    // Check for jokers on each part first. Otherwise as above.
+    match counts.len() {
+        1 => Hand::FiveOfAKind(cards),
+        2 => {
+            if counts.contains_key(&Card::Joker) {
+                // Any jokers means 1 or 4 which means 5 of a kind.
+                Hand::FiveOfAKind(cards)
+            } else if *counts.values().max().unwrap() == 4 {
+                // Either AAAAx or AAAKK so if one count is 4 we know 4 of a kind.
+                Hand::FourOfAKind(cards)
+            } else {
+                // Otherwise it has to be XXXYY so a full house.
+                Hand::FullHouse(cards)
+            }
+        }
+        3 => {
+            if counts.contains_key(&Card::Joker) {
+                match counts[&Card::Joker] {
+                    2 | 3 => {
+                        // 3 jokers means 4 of a kind
+                        // 2 jokers means 4 of a kind also (JJxxy)
+                        // 1 joker means 4 of a kind also (Jxxxy)
+                        Hand::FourOfAKind(cards)
+                    }
+                    1 => {
+                        // 1 Joker means either xxxJy or xxJyy. The former is 4 of a kind
+                        // and the latter is a full house.
+                        if *counts.values().max().unwrap() == 3 {
+                            Hand::FourOfAKind(cards)
+                        } else {
+                            Hand::FullHouse(cards)
+                        }
+                    }
+                    _ => panic!(),
+                }
+            } else {
+                // Either AAAxy or AAKKy so if one count is 3 we know 3 of a kind.
+                if *counts.values().max().unwrap() == 3 {
+                    Hand::ThreeOfAKind(cards)
+                } else {
+                    Hand::TwoPair(cards)
+                }
+            }
+        }
+        4 => {
+            if counts.contains_key(&Card::Joker) {
+                // any joker means xyzaa == 3 of a kind for a=J or x|y|z=J
+                Hand::ThreeOfAKind(cards)
+            } else {
+                Hand::OnePair(cards)
+            }
+        }
+        5 => {
+            if counts.contains_key(&Card::Joker) {
+                // any joker means xyzab == pair
+                Hand::OnePair(cards)
+            } else {
+                Hand::HighCard(cards)
+            }
+        }
+        _ => panic!(),
+    }
 }
