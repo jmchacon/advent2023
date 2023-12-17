@@ -42,6 +42,11 @@ fn main() -> Result<()> {
     // For part2 we need to find everything ending with "A" as a start position
     // and compute their path. Then the way to get them all together is to get the
     // LCM of all 6 numbers which is the fold at the end.
+    //
+    // It's not guarenteed LCM works here except if you check each path you'll
+    // see it takes N steps to get to a Z and then the same N to return to that
+    // Z. At that point LCM is valid for "when do all 6 paths meet at the same time?".
+    // If LCM didn't work likely Chinese Remainder Therom could be used.
     let curs = conditions
         .keys()
         .filter(|f| f.ends_with('A'))
