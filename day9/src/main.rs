@@ -1,15 +1,10 @@
 //! day9 advent 20XX
 use clap::Parser;
 use color_eyre::eyre::Result;
-use grid::{Grid, Location};
-use itertools::Itertools;
-use slab_tree::tree::TreeBuilder;
-use std::collections::HashMap;
 use std::fs::File;
 use std::io;
 use std::io::BufRead;
 use std::path::Path;
-use strum_macros::Display;
 
 #[derive(Parser)]
 #[command(author, version, about)]
@@ -29,6 +24,36 @@ fn main() -> Result<()> {
     let file = File::open(filename)?;
     let lines: Vec<String> = io::BufReader::new(file).lines().flatten().collect();
 
-    for (line_num, line) in lines.iter().enumerate() {}
+    let mut sum = 0;
+    for line in &lines {
+        // Seed the initial line.
+        let mut parts = line
+            .split_whitespace()
+            .map(|f| f.parse::<isize>().unwrap())
+            .collect::<Vec<_>>();
+
+        // Keep a record of the last entry for each line.
+        let mut diffs = vec![*parts.last().unwrap()];
+        loop {
+            if args.debug {
+                println!("parts: {parts:?}");
+            }
+            let mut next = vec![];
+            for i in 0..parts.len() - 1 {
+                next.push(parts[i + 1] - parts[i]);
+            }
+            diffs.push(*next.last().unwrap());
+            parts = next;
+            if parts.iter().any(|f| *f != 0) {
+                continue;
+            }
+            break;
+        }
+        if args.debug {
+            println!("diffs: {diffs:?}");
+        }
+        sum += diffs.iter().sum::<isize>();
+    }
+    println!("part1: {sum}");
     Ok(())
 }
