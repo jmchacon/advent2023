@@ -65,19 +65,24 @@ fn main() -> Result<()> {
 
     // Take each original loc and move it along if needed.
     let mut adjusted_locs = vec![];
+    let mut adjusted_big_locs = vec![];
     for l in &locs {
         let mut new = l.clone();
+        let mut new_big = l.clone();
         for c in &empty_cols {
             if l.0 > *c {
                 new.0 += 1;
+                new_big.0 += 999_999;
             }
         }
         for r in &empty_rows {
             if l.1 > *r {
                 new.1 += 1;
+                new_big.1 += 999_999;
             }
         }
         adjusted_locs.push(new);
+        adjusted_big_locs.push(new_big);
     }
 
     if args.debug {
@@ -89,17 +94,23 @@ fn main() -> Result<()> {
             &adjusted_locs,
         );
         println!();
+        print_grid(
+            lines[0].len() + 10 * empty_cols.len(),
+            lines.len() + 10 * empty_rows.len(),
+            &adjusted_big_locs,
+        );
     }
 
-    let mut sum = 0;
-    for loc in adjusted_locs.iter().combinations(2) {
-        let dist = loc[0].distance(loc[1]);
-        if args.debug {
-            println!("{loc:?} {dist}");
-        }
-        sum += dist;
-    }
+    let sum = adjusted_locs
+        .iter()
+        .combinations(2)
+        .fold(0, |acc, f| acc + f[0].distance(f[1]));
+    let sum_big: u64 = adjusted_big_locs
+        .iter()
+        .combinations(2)
+        .fold(0, |acc, f| acc + u64::from(f[0].distance(f[1])));
     println!("part1: {sum}");
+    println!("part2: {sum_big}");
     Ok(())
 }
 
