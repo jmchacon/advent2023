@@ -1,15 +1,13 @@
 //! day11 advent 20XX
 use clap::Parser;
 use color_eyre::eyre::Result;
-use grid::{Grid, Location};
+use grid::Location;
 use itertools::Itertools;
-use slab_tree::tree::TreeBuilder;
-use std::collections::HashMap;
+use std::collections::HashSet;
 use std::fs::File;
 use std::io;
 use std::io::BufRead;
 use std::path::Path;
-use strum_macros::Display;
 
 #[derive(Parser)]
 #[command(author, version, about)]
@@ -29,6 +27,94 @@ fn main() -> Result<()> {
     let file = File::open(filename)?;
     let lines: Vec<String> = io::BufReader::new(file).lines().flatten().collect();
 
-    for (line_num, line) in lines.iter().enumerate() {}
+    let mut locs = vec![];
+    for (line_num, line) in lines.iter().enumerate() {
+        for (x, b) in line.as_bytes().iter().enumerate() {
+            match b {
+                b'.' => {}
+                b'#' => {
+                    locs.push(Location(
+                        isize::try_from(x).unwrap(),
+                        isize::try_from(line_num).unwrap(),
+                    ));
+                }
+                _ => panic!("bad line: {line} on {}", line_num + 1),
+            }
+        }
+    }
+    let cols = locs.iter().map(|f| f.1).collect::<HashSet<_>>();
+    let rows = locs.iter().map(|f| f.0).collect::<HashSet<_>>();
+    let mut empty_cols = vec![];
+    let mut empty_rows = vec![];
+    for i in 0..lines[0].len() {
+        let x = isize::try_from(i).unwrap();
+        if !cols.contains(&x) {
+            empty_rows.push(x);
+        }
+    }
+    for i in 0..lines.len() {
+        let y = isize::try_from(i).unwrap();
+        if !rows.contains(&y) {
+            empty_cols.push(y);
+        }
+    }
+    if args.debug {
+        println!("empty_cols: {empty_cols:?}");
+        println!("empty_rows: {empty_rows:?}");
+    }
+
+    // Take each original loc and move it along if needed.
+    let mut adjusted_locs = vec![];
+    for l in &locs {
+        let mut new = l.clone();
+        for c in &empty_cols {
+            if l.0 > *c {
+                new.0 += 1;
+            }
+        }
+        for r in &empty_rows {
+            if l.1 > *r {
+                new.1 += 1;
+            }
+        }
+        adjusted_locs.push(new);
+    }
+
+    if args.debug {
+        print_grid(lines[0].len(), lines.len(), &locs);
+        println!();
+        print_grid(
+            lines[0].len() + empty_cols.len(),
+            lines.len() + empty_rows.len(),
+            &adjusted_locs,
+        );
+        println!();
+    }
+
+    let mut sum = 0;
+    for loc in adjusted_locs.iter().combinations(2) {
+        let dist = loc[0].distance(loc[1]);
+        if args.debug {
+            println!("{loc:?} {dist}");
+        }
+        sum += dist;
+    }
+    println!("part1: {sum}");
     Ok(())
+}
+
+fn print_grid(width: usize, height: usize, locs: &[Location]) {
+    let c = locs.iter().collect::<HashSet<_>>();
+    for y in 0..height {
+        for x in 0..width {
+            let x = isize::try_from(x).unwrap();
+            let y = isize::try_from(y).unwrap();
+            if c.contains(&Location(x, y)) {
+                print!("#");
+            } else {
+                print!(".");
+            }
+        }
+        println!();
+    }
 }
