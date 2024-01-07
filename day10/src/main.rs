@@ -6,8 +6,7 @@ use crate::Pipes::*;
 use clap::Parser;
 use color_eyre::eyre::Result;
 use grid::{Grid, Location};
-use std::collections::HashMap;
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 use std::fs::File;
 use std::io;
 use std::io::BufRead;
@@ -35,6 +34,8 @@ enum Pipes {
     #[default]
     Ground,
     Start,
+    Outside,
+    Inside,
 }
 
 #[derive(Debug, Display, Eq, Hash, Ord, PartialEq, PartialOrd)]
@@ -52,7 +53,10 @@ fn main() -> Result<()> {
 
     let filename = Path::new(env!("CARGO_MANIFEST_DIR")).join(args.filename);
     let file = File::open(filename)?;
-    let lines: Vec<String> = io::BufReader::new(file).lines().flatten().collect();
+    let lines: Vec<String> = io::BufReader::new(file)
+        .lines()
+        .map_while(Result::ok)
+        .collect();
 
     let allowed = HashMap::from([
         (Vertical, HashSet::from([North, South])),
@@ -161,7 +165,61 @@ fn main() -> Result<()> {
     }
     println!("part1: {}", cnt / 2);
 
+    find_enclosed(&mut walk_grid);
+    let cnt = walk_grid.iter().filter(|f| *f.1 == Inside).count();
+
+    if args.debug {
+        print_grid(&walk_grid);
+    }
+    println!("part2: {cnt}");
     Ok(())
+}
+
+fn turn_outside(grid: &mut Grid<Pipes>, loc: &Location) {
+    let t = grid.get_mut(loc);
+    if *t == Ground {
+        *t = Outside;
+    }
+}
+
+fn find_enclosed(grid: &mut Grid<Pipes>) {
+    // Find all ground in top and bottom row and just turn those to outside.
+    let bot = isize::try_from(grid.height() - 1).unwrap();
+    for x in 0..grid.width() {
+        let x = isize::try_from(x).unwrap();
+        turn_outside(grid, &Location(x, 0));
+        turn_outside(grid, &Location(x, bot));
+    }
+
+    // Now do the same thing with the left and right edge. Technically we cover
+    // the corners twice this way but excluding is annoying and doesn't really cost anything.
+    let right = isize::try_from(grid.width() - 1).unwrap();
+    for y in 0..grid.height() {
+        let y = isize::try_from(y).unwrap();
+        turn_outside(grid, &Location(0, y));
+        turn_outside(grid, &Location(right, y));
+    }
+
+    let mut seen = HashSet::new();
+    let mut tbd = grid
+        .iter()
+        .filter_map(|f| if *f.1 == Ground { Some(f.0) } else { None });
+
+    let mut possible = vec![];
+    //let mut fill_type = Inside;
+    loop {
+        let Some(test) = tbd.next() else {
+            break;
+        };
+        if seen.contains(&test) {
+            continue;
+        }
+        possible.push(test.clone());
+        seen.insert(test.clone());
+
+        // let done = false;
+        //let mut flood = vec![];
+    }
 }
 
 fn print_grid(grid: &Grid<Pipes>) {
@@ -175,6 +233,8 @@ fn print_grid(grid: &Grid<Pipes>) {
             SEBend => print!("F"),
             Ground => print!("."),
             Start => print!("S"),
+            Outside => print!("O"),
+            Inside => print!("I"),
         }
         if usize::try_from(g.0 .0).unwrap() == grid.width() - 1 {
             println!();

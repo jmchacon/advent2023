@@ -45,7 +45,10 @@ fn main() -> Result<()> {
 
     let filename = Path::new(env!("CARGO_MANIFEST_DIR")).join(args.filename);
     let file = File::open(filename)?;
-    let lines: Vec<String> = io::BufReader::new(file).lines().flatten().collect();
+    let lines: Vec<String> = io::BufReader::new(file)
+        .lines()
+        .map_while(Result::ok)
+        .collect();
 
     let mut hands = vec![];
     let mut hands_part2 = vec![];
