@@ -1,4 +1,4 @@
-//! day12 advent 20XX
+//! day14 advent 20XX
 use clap::Parser;
 use color_eyre::eyre::Result;
 use grid::{Grid, Location};
@@ -27,7 +27,10 @@ fn main() -> Result<()> {
 
     let filename = Path::new(env!("CARGO_MANIFEST_DIR")).join(args.filename);
     let file = File::open(filename)?;
-    let lines: Vec<String> = io::BufReader::new(file).lines().flatten().collect();
+    let lines: Vec<String> = io::BufReader::new(file)
+        .lines()
+        .map_while(Result::ok)
+        .collect();
 
     for (line_num, line) in lines.iter().enumerate() {}
     Ok(())
