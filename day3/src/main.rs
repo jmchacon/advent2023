@@ -138,7 +138,7 @@ fn main() -> Result<()> {
     Ok(())
 }
 
-fn compute_num(num_digits: &Vec<usize>) -> usize {
+fn compute_num(num_digits: &[usize]) -> usize {
     let l = num_digits.len() - 1;
 
     // The numbers look like this in the vec:
