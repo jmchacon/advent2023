@@ -477,7 +477,7 @@ checksum = "4271d37baee1b8c7e4b708028c57d816cf9d2434acb33a549475f78c181f6253"
 [[package]]
 name = "grid"
 version = "0.1.0"
-source = "git+https://github.com/jmchacon/advent.git#abf732bb17f13fffc454dd5c69d73c4176fc4bab"
+source = "git+https://github.com/jmchacon/advent.git#28f005fde99fb2db785176f4dfea07362847bd89"
 
 [[package]]
 name = "heck"
