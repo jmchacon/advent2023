@@ -1,15 +1,10 @@
 //! day15 advent 20XX
 use clap::Parser;
 use color_eyre::eyre::Result;
-use grid::{Grid, Location};
-use itertools::Itertools;
-use slab_tree::tree::TreeBuilder;
-use std::collections::HashMap;
 use std::fs::File;
 use std::io;
 use std::io::BufRead;
 use std::path::Path;
-use strum_macros::Display;
 
 #[derive(Parser)]
 #[command(author, version, about)]
@@ -32,6 +27,22 @@ fn main() -> Result<()> {
         .map_while(Result::ok)
         .collect();
 
-    for (line_num, line) in lines.iter().enumerate() {}
+    // For this we can assume there's one line.
+    let parts = lines[0].split(',').collect::<Vec<_>>();
+
+    let mut sum = 0;
+    for p in parts.iter().copied() {
+        sum += hash(p);
+    }
+    println!("part1: {sum}");
     Ok(())
+}
+
+fn hash(p: &str) -> usize {
+    let mut val = 0;
+    for b in p.bytes() {
+        val += usize::from(b);
+        val = (val * 17) % 256;
+    }
+    val
 }
