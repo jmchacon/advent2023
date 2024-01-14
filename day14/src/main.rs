@@ -91,6 +91,14 @@ fn main() -> Result<()> {
     loop {
         assert!(!start > 900, "Can't find a loop after checking 200-900");
 
+        // Check the current run against the next N to see if they all match.
+        // Then do it again with the next one and the sequence after. This way
+        // we can assume it's actually repeating at this point.
+        // This avoids a short sequence of
+        // 1 2 1 2 3 4
+        // possibly tripping it up. Yes it would fail to 1 2 1 2 1 2 for instance
+        // but in general the sequences don't go up and down. A new repetition will
+        // generally increase at the start but then decrease until it repeats.
         if loads[start..start + size] == loads[start + size..start + size * 2]
             && loads[start + size..start + size * 2] == loads[start + size * 2..start + size * 3]
         {
