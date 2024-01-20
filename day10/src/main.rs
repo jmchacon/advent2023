@@ -5,8 +5,9 @@ use crate::Direction::*;
 use crate::Pipes::*;
 use clap::Parser;
 use color_eyre::eyre::Result;
-use grid::{Grid, Location};
+use grid::{print_grid, Grid, Location};
 use std::collections::{HashMap, HashSet};
+use std::fmt;
 use std::fs::File;
 use std::io;
 use std::io::BufRead;
@@ -23,7 +24,7 @@ struct Args {
     debug: bool,
 }
 
-#[derive(Clone, Debug, Default, Display, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[derive(Clone, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd)]
 enum Pipes {
     Vertical,
     Horizontal,
@@ -222,22 +223,19 @@ fn find_enclosed(grid: &mut Grid<Pipes>) {
     }
 }
 
-fn print_grid(grid: &Grid<Pipes>) {
-    for g in grid {
-        match g.1 {
-            Vertical => print!("|"),
-            Horizontal => print!("-"),
-            NEBend => print!("L"),
-            NWBend => print!("J"),
-            SWBend => print!("7"),
-            SEBend => print!("F"),
-            Ground => print!("."),
-            Start => print!("S"),
-            Outside => print!("O"),
-            Inside => print!("I"),
-        }
-        if usize::try_from(g.0 .0).unwrap() == grid.width() - 1 {
-            println!();
+impl fmt::Display for Pipes {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Vertical => write!(f, "|"),
+            Horizontal => write!(f, "-"),
+            NEBend => write!(f, "L"),
+            NWBend => write!(f, "J"),
+            SWBend => write!(f, "7"),
+            SEBend => write!(f, "F"),
+            Ground => write!(f, "."),
+            Start => write!(f, "S"),
+            Outside => write!(f, "O"),
+            Inside => write!(f, "I"),
         }
     }
 }

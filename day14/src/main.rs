@@ -1,12 +1,12 @@
 //! day14 advent 20XX
 use clap::Parser;
 use color_eyre::eyre::Result;
-use grid::{Grid, Location};
+use core::fmt;
+use grid::{print_grid, Grid, Location};
 use std::fs::File;
 use std::io;
 use std::io::BufRead;
 use std::path::Path;
-use strum_macros::Display;
 
 #[derive(Parser)]
 #[command(author, version, about)]
@@ -18,7 +18,7 @@ struct Args {
     debug: bool,
 }
 
-#[derive(Clone, Debug, Default, Display, PartialEq)]
+#[derive(Clone, Debug, Default, PartialEq)]
 enum Entry {
     #[default]
     Empty,
@@ -440,16 +440,12 @@ fn west_grid(grid: &Grid<Entry>) -> Grid<Entry> {
     west_grid
 }
 
-fn print_grid(grid: &Grid<Entry>) {
-    for g in grid {
-        match g.1 {
-            Entry::Empty => print!("."),
-            Entry::Cube => print!("#"),
-            Entry::Round => print!("O"),
-        }
-        if usize::try_from(g.0 .0).unwrap() == grid.width() - 1 {
-            println!();
+impl fmt::Display for Entry {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Entry::Empty => write!(f, "."),
+            Entry::Cube => write!(f, "#"),
+            Entry::Round => write!(f, "O"),
         }
     }
-    println!();
 }

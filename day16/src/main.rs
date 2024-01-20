@@ -1,7 +1,8 @@
 //! day16 advent 20XX
 use clap::Parser;
 use color_eyre::eyre::Result;
-use grid::{Grid, Location};
+use core::fmt;
+use grid::{print_grid, Grid, Location};
 use std::io;
 use std::io::BufRead;
 use std::path::Path;
@@ -19,7 +20,7 @@ struct Args {
     debug: bool,
 }
 
-#[derive(Clone, Debug, Default, Display, PartialEq)]
+#[derive(Clone, Debug, Default, PartialEq)]
 enum Entry {
     #[default]
     Empty,
@@ -37,7 +38,7 @@ enum Direction {
     West,
 }
 
-#[derive(Clone, Debug, Default, Display, PartialEq)]
+#[derive(Clone, Debug, Default, PartialEq)]
 enum Energized {
     #[default]
     Empty,
@@ -268,7 +269,7 @@ fn walk_grid(grid: &Grid<Entry>, start: &Location, init_dir: &Direction, debug: 
         }
     }
     if debug {
-        print_energized_grid(&energized_grid);
+        print_grid(&energized_grid);
     }
 
     energized_grid
@@ -277,31 +278,23 @@ fn walk_grid(grid: &Grid<Entry>, start: &Location, init_dir: &Direction, debug: 
         .count()
 }
 
-fn print_grid(grid: &Grid<Entry>) {
-    for g in grid {
-        match g.1 {
-            Entry::Empty => print!("."),
-            Entry::MirrorForward => print!("/"),
-            Entry::MirrorBackward => print!("\\"),
-            Entry::SplitterUp => print!("|"),
-            Entry::SplitterSide => print!("-"),
-        }
-        if usize::try_from(g.0 .0).unwrap() == grid.width() - 1 {
-            println!();
+impl fmt::Display for Entry {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Entry::Empty => write!(f, "."),
+            Entry::MirrorForward => write!(f, "/"),
+            Entry::MirrorBackward => write!(f, "\\"),
+            Entry::SplitterUp => write!(f, "|"),
+            Entry::SplitterSide => write!(f, "-"),
         }
     }
-    println!();
 }
 
-fn print_energized_grid(grid: &Grid<Energized>) {
-    for g in grid {
-        match g.1 {
-            Energized::Empty => print!("."),
-            Energized::Entered(_) => print!("#"),
-        }
-        if usize::try_from(g.0 .0).unwrap() == grid.width() - 1 {
-            println!();
+impl fmt::Display for Energized {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Energized::Empty => write!(f, "."),
+            Energized::Entered(_) => write!(f, "#"),
         }
     }
-    println!();
 }
