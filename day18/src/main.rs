@@ -48,8 +48,11 @@ fn main() -> Result<()> {
 
     let mut locs = HashMap::new();
     let mut cur = Location(0, 0);
+    let mut part_loc = Location(0, 0);
     locs.insert(cur.clone(), "#000000");
     let mut testlocs = vec![];
+
+    let mut vertices = vec![part_loc.clone()];
 
     for (line_num, line) in lines.iter().enumerate() {
         let parts = line.split_whitespace().collect::<Vec<_>>();
@@ -84,7 +87,47 @@ fn main() -> Result<()> {
             }
             _ => panic!("Bad line {} - {line}", line_num + 1),
         }
+
+        let dist = isize::from_str_radix(&parts[2][2..7], 16).unwrap();
+        match &parts[2][7..8] {
+            // R
+            "0" => {
+                if args.debug {
+                    println!("R {dist}");
+                }
+                part_loc.0 += dist;
+            }
+            // D
+            "1" => {
+                if args.debug {
+                    println!("D {dist}");
+                }
+                part_loc.1 += dist;
+            }
+            // L
+            "2" => {
+                if args.debug {
+                    println!("L {dist}");
+                }
+                part_loc.0 -= dist;
+            }
+            // U
+            "3" => {
+                if args.debug {
+                    println!("U {dist}");
+                }
+                part_loc.1 -= dist;
+            }
+            _ => panic!("Bad line {} - {line}", line_num + 1),
+        }
+        vertices.push(part_loc.clone());
     }
+
+    // Make sure it came back to the start.
+    assert!(
+        *vertices.last().unwrap() == Location(0, 0),
+        "Polygon didn't go back to start? - {vertices:?}"
+    );
 
     // Some easy constants we need later for various things and debugging.
     let min_x = locs.iter().map(|l| l.0 .0).min().unwrap();
@@ -118,7 +161,57 @@ fn main() -> Result<()> {
     }
     println!("part1: {}", locs.len());
 
+    if args.debug {
+        println!("vertices:\n{vertices:?}");
+    }
+
+    println!("part2: {}", picks_theorem(&vertices, args.debug));
     Ok(())
+}
+
+// This uses the shoelace theorem to calculate the area inside the polygon.
+// NOTE: This won't include the polygon itself. For that take this answer
+//       and plug it into Pick's theorem.
+fn shoelace_area(vertices: &[Location], debug: bool) -> i128 {
+    let mut sum: i128 = 0;
+    for i in 0..vertices.len() - 1 {
+        let p0 = &vertices[i];
+        let p1 = &vertices[i + 1];
+        let area: i128 = (p0.0 * p1.1 - p0.1 * p1.0).try_into().unwrap();
+        sum += area;
+        if debug {
+            println!("({p0},{p1}) = {area}");
+        }
+    }
+    if debug {
+        println!("Sum = {sum}");
+    }
+    sum /= 2;
+    sum
+}
+
+fn picks_theorem(vertices: &[Location], debug: bool) -> i128 {
+    let inside = shoelace_area(vertices, debug);
+    let mut b: i128 = 0;
+    for i in 0..vertices.len() - 1 {
+        let p0 = &vertices[i];
+        let p1 = &vertices[i + 1];
+        let dist: i128 = ((p0.0 - p1.0) + (p0.1 - p1.1))
+            .unsigned_abs()
+            .try_into()
+            .unwrap();
+        if debug {
+            println!("({p0},{p1}) = {dist}");
+        }
+        b += dist;
+    }
+    // The above never counts 2 points so add 4 here so the math works out.
+    // Can't just add one at every intersection or you double count each one.
+    b += 4;
+    if debug {
+        println!("inside: {inside} b: {b}");
+    }
+    inside + b / 2 - 1
 }
 
 // Visualize the map data into an image and use egui to toss up a window so we can see it.
