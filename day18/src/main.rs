@@ -289,7 +289,7 @@ impl MyApp {
 }
 
 impl eframe::App for MyApp {
-    fn update(&mut self, ctx: &egui::Context, frame: &mut eframe::Frame) {
+    fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         egui::CentralPanel::default()
             .frame(egui::Frame::none().fill(egui::Color32::GRAY))
             .show(ctx, |ui| {
@@ -301,7 +301,8 @@ impl eframe::App for MyApp {
                 s[1] *= self.magnify;
                 ui.add(egui::Image::from_texture(&self.texture).fit_to_exact_size(s));
             });
-        frame.set_window_size(ctx.used_size());
+        ctx.send_viewport_cmd(egui::ViewportCommand::MinInnerSize(ctx.used_size()));
+        ctx.send_viewport_cmd(egui::ViewportCommand::MaxInnerSize(ctx.used_size()));
     }
 }
 
