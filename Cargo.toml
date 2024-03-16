@@ -64,7 +64,7 @@ debug = true
 
 [workspace.dependencies]
 clap = { version = "~4.0", features = ["derive", "wrap_help"] }
-color-eyre = { version = "0.6.2", default-features = false }
+color-eyre = { version = "0.6.3", default-features = false }
 strum = "0.24.1"
 strum_macros = "0.24.1"
 grid = { git = "https://github.com/jmchacon/advent.git" }
