@@ -256,7 +256,7 @@ fn display_map(locs: &HashMap<Location, &str>, mult: f32) -> Result<()> {
     let res = eframe::run_native(
         "Debug path",
         eframe::NativeOptions::default(),
-        Box::new(|cc| Box::new(MyApp::new(cc, data, *width, *height, *mult))),
+        Box::new(|cc| Ok(Box::new(MyApp::new(cc, data, *width, *height, *mult)))),
     );
 
     if let Err(e) = res {
