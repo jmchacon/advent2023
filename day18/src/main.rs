@@ -291,7 +291,7 @@ impl MyApp {
 impl eframe::App for MyApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         egui::CentralPanel::default()
-            .frame(egui::Frame::none().fill(egui::Color32::GRAY))
+            .frame(egui::Frame::new().fill(egui::Color32::GRAY))
             .show(ctx, |ui| {
                 ui.add_space(10.0);
 
