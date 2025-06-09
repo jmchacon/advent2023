@@ -74,6 +74,6 @@ slab_tree = "0.3.2"
 
 [workspace.package]
 edition = "2021"
-rust-version = "1.81"
+rust-version = "1.82"
 authors = ["James Chacon <chacon.james@gmail.com>"]
 
