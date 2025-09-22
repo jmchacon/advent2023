@@ -765,7 +765,7 @@ dependencies = [
  "grid",
  "itertools",
  "slab_tree",
- "strum 0.24.1",
+ "strum",
  "strum_macros",
 ]
 
@@ -778,7 +778,7 @@ dependencies = [
  "grid",
  "itertools",
  "slab_tree",
- "strum 0.24.1",
+ "strum",
  "strum_macros",
 ]
 
@@ -791,7 +791,7 @@ dependencies = [
  "grid",
  "itertools",
  "slab_tree",
- "strum 0.24.1",
+ "strum",
  "strum_macros",
 ]
 
@@ -804,7 +804,7 @@ dependencies = [
  "grid",
  "itertools",
  "slab_tree",
- "strum 0.24.1",
+ "strum",
  "strum_macros",
 ]
 
@@ -817,7 +817,7 @@ dependencies = [
  "grid",
  "itertools",
  "slab_tree",
- "strum 0.24.1",
+ "strum",
  "strum_macros",
 ]
 
@@ -830,7 +830,7 @@ dependencies = [
  "grid",
  "itertools",
  "slab_tree",
- "strum 0.24.1",
+ "strum",
  "strum_macros",
 ]
 
@@ -843,7 +843,7 @@ dependencies = [
  "grid",
  "itertools",
  "slab_tree",
- "strum 0.24.1",
+ "strum",
  "strum_macros",
 ]
 
@@ -856,7 +856,7 @@ dependencies = [
  "grid",
  "itertools",
  "slab_tree",
- "strum 0.24.1",
+ "strum",
  "strum_macros",
 ]
 
@@ -869,7 +869,7 @@ dependencies = [
  "grid",
  "itertools",
  "slab_tree",
- "strum 0.24.1",
+ "strum",
  "strum_macros",
 ]
 
@@ -884,7 +884,7 @@ dependencies = [
  "grid",
  "itertools",
  "slab_tree",
- "strum 0.24.1",
+ "strum",
  "strum_macros",
 ]
 
@@ -897,7 +897,7 @@ dependencies = [
  "grid",
  "itertools",
  "slab_tree",
- "strum 0.24.1",
+ "strum",
  "strum_macros",
 ]
 
@@ -910,7 +910,7 @@ dependencies = [
  "grid",
  "itertools",
  "slab_tree",
- "strum 0.24.1",
+ "strum",
  "strum_macros",
 ]
 
@@ -923,7 +923,7 @@ dependencies = [
  "grid",
  "itertools",
  "slab_tree",
- "strum 0.24.1",
+ "strum",
  "strum_macros",
 ]
 
@@ -936,7 +936,7 @@ dependencies = [
  "grid",
  "itertools",
  "slab_tree",
- "strum 0.24.1",
+ "strum",
  "strum_macros",
 ]
 
@@ -949,7 +949,7 @@ dependencies = [
  "grid",
  "itertools",
  "slab_tree",
- "strum 0.24.1",
+ "strum",
  "strum_macros",
 ]
 
@@ -962,7 +962,7 @@ dependencies = [
  "grid",
  "itertools",
  "slab_tree",
- "strum 0.24.1",
+ "strum",
  "strum_macros",
 ]
 
@@ -975,7 +975,7 @@ dependencies = [
  "grid",
  "itertools",
  "slab_tree",
- "strum 0.24.1",
+ "strum",
  "strum_macros",
 ]
 
@@ -988,7 +988,7 @@ dependencies = [
  "grid",
  "itertools",
  "slab_tree",
- "strum 0.24.1",
+ "strum",
  "strum_macros",
 ]
 
@@ -1001,7 +1001,7 @@ dependencies = [
  "grid",
  "itertools",
  "slab_tree",
- "strum 0.24.1",
+ "strum",
  "strum_macros",
 ]
 
@@ -1014,7 +1014,7 @@ dependencies = [
  "grid",
  "itertools",
  "slab_tree",
- "strum 0.24.1",
+ "strum",
  "strum_macros",
 ]
 
@@ -1027,7 +1027,7 @@ dependencies = [
  "grid",
  "itertools",
  "slab_tree",
- "strum 0.24.1",
+ "strum",
  "strum_macros",
 ]
 
@@ -1040,7 +1040,7 @@ dependencies = [
  "grid",
  "itertools",
  "slab_tree",
- "strum 0.24.1",
+ "strum",
  "strum_macros",
 ]
 
@@ -1053,7 +1053,7 @@ dependencies = [
  "grid",
  "itertools",
  "slab_tree",
- "strum 0.24.1",
+ "strum",
  "strum_macros",
 ]
 
@@ -1067,7 +1067,7 @@ dependencies = [
  "itertools",
  "num",
  "slab_tree",
- "strum 0.24.1",
+ "strum",
  "strum_macros",
 ]
 
@@ -1080,7 +1080,7 @@ dependencies = [
  "grid",
  "itertools",
  "slab_tree",
- "strum 0.24.1",
+ "strum",
  "strum_macros",
 ]
 
@@ -2132,7 +2132,7 @@ dependencies = [
  "once_cell",
  "rustc-hash 1.1.0",
  "spirv",
- "strum 0.26.3",
+ "strum",
  "thiserror 2.0.12",
  "unicode-ident",
 ]
@@ -3157,12 +3157,6 @@ name = "strsim"
 version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "73473c0e59e6d5812c5dfe2a064a6444949f089e20eec9a2e5506596494e4623"
-
-[[package]]
-name = "strum"
-version = "0.24.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "063e6045c0e62079840579a7e47a355ae92f60eb74daaf156fb1e84ba164e63f"
 
 [[package]]
 name = "strum"
