@@ -82,7 +82,7 @@ jobs:
     # https://docs.github.com/en/actions/learn-github-actions/contexts#context-availability
     strategy:
       matrix:
-        msrv: ["1.82"] # ICU and a bunch of others
+        msrv: ["1.85"] # 2024 edition
     name: ubuntu / ${{ matrix.msrv }}
     steps:
       - uses: actions/checkout@v5
