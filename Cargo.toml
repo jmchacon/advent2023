@@ -69,7 +69,7 @@ strum = "0.26.3"
 strum_macros = "0.27.2"
 grid = { git = "https://github.com/jmchacon/advent.git" }
 idna = "1.1.0"
-itertools = "0.10.5"
+itertools = "0.14.0"
 slab_tree = "0.3.2"
 
 [workspace.package]
