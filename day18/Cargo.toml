@@ -13,5 +13,5 @@ strum = { workspace = true }
 strum_macros = { workspace = true }
 itertools = { workspace = true }
 grid = { workspace = true }
-egui = "0.32.3"
+egui = "0.33.0"
 eframe = "0.32.3"
