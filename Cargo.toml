@@ -65,11 +65,11 @@ debug = true
 [workspace.dependencies]
 clap = { version = "~4.5", features = ["derive", "wrap_help"] }
 color-eyre = { version = "0.6.5", default-features = false }
-strum = "0.26.3"
+strum = "0.27.2"
 strum_macros = "0.27.2"
 grid = { git = "https://github.com/jmchacon/advent.git" }
 idna = "1.1.0"
-itertools = "0.10.5"
+itertools = "0.14.0"
 slab_tree = "0.3.2"
 
 [workspace.package]
